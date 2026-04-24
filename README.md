@@ -8,10 +8,9 @@ This notebook processes raw historical data, algorithmically cleanses hardware e
 ## Pipeline Architecture
 
 ### 1. Data Integrity & Outlier Correction
-Raw sensor data is inherently messy. Instead of using blind statistical fences (like a standard IQR or Isolation Forest) which can accidentally delete legitimate holiday drops or summer peaks, we use a **Rolling Physics Envelope**. 
-* We calculate a 24-hour rolling median to draw a smooth baseline that perfectly traces the center of the daily demand wave.
-* We build a dynamic "tunnel" (15% deviation margin) around that wave.
-* If a sensor reading violently snaps away from this baseline beyond physical limits, we flag it as a hardware error and destroy it, completely protecting legitimate low-demand periods.
+Raw sensor data is inherently messy and prone to severe dropouts. To clean this without destroying legitimate low-demand periods (like holidays), we implemented a hybrid ML + Physics approach:
+1. **Unsupervised Isolation Forest (PyOD):** We train an `IForest` algorithm, feeding it both the power demand and cyclical time features (hour/month sine and cosine). This allows the model to understand the contextual time of day and flag mathematically isolated anomalies (contamination = 0.5%).
+2. **The Physical Failsafe:** Algorithms can sometimes over-flag tiny nighttime fluctuations. To prevent this, we apply a strict physical floor. An anomaly is only destroyed if the PyOD model flags it *and* the demand violently deviates from a 24-hour rolling median by more than 500 MW.
 
 ### 2. Smart Imputation Strategy
 We repair missing data using a dual-strategy approach based on the size of the gap:
