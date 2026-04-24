@@ -32,7 +32,7 @@ We utilize an **XGBoost Regressor** (`XGBRegressor`). Tree-based gradient boosti
 ### 5. Evaluation
 The model's accuracy is evaluated using **MAPE (Mean Absolute Percentage Error)**, ensuring our error metric remains completely relative and interpretable regardless of the grid's baseline growth over the decade.
 
-* **Final MAPE obtained = 1.804 %** *
+* **Final MAPE obtained = 1.770 %** 
 
 ## Setup & Execution
 
